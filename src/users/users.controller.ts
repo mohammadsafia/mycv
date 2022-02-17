@@ -5,18 +5,27 @@ import { UsersService } from '@users/users.service';
 import { UpdateUserDto } from '@users/dtos/update-user.dto';
 import { Serialize } from '@interceptors/serialize.interceptor';
 import { UserDto } from '@users/dtos/user.dto';
+import { AuthService } from '@users/auth.service';
 
 
 @ApiTags('Users')
 @Serialize(UserDto)
 @Controller('auth')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService
+  ) {
   }
 
   @Post('/signup')
   createUser(@Body() body: CreateUserDto) {
-    return this.usersService.create(body.email, body.password);
+    return this.authService.signup(body.email, body.password);
+  }
+
+  @Post('/signin')
+  signin(@Body() body: CreateUserDto) {
+    return this.authService.signin(body.email, body.password);
   }
 
 
