@@ -1,15 +1,29 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, Session } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Session,
+  UseGuards
+} from '@nestjs/common';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '@users/dtos/create-user.dto';
 import { UsersService } from '@users/users.service';
 import { UpdateUserDto } from '@users/dtos/update-user.dto';
 import { Serialize } from '@interceptors/serialize.interceptor';
 import { UserDto } from '@users/dtos/user.dto';
 import { AuthService } from '@users/auth.service';
+import { CurrentUser } from '@users/decorators/current-user.decorator';
+import { User } from '@users/user.entity';
+import { AuthGuard } from '@users/guards/auth.guard';
 
-
-@ApiTags('Users')
 @Serialize(UserDto)
+@ApiTags('Users')
 @Controller('auth')
 export class UsersController {
   constructor(
@@ -26,9 +40,11 @@ export class UsersController {
   }
 
   @Get('/whoami')
-  whoAmI(@Session() session: any) {
-    return this.usersService.findOne(session.id);
+  @UseGuards(AuthGuard)
+  whoAmI(@CurrentUser() user: User) {
+    return user;
   }
+
 
   @Post('/signout')
   signOut(@Session() session: any) {
